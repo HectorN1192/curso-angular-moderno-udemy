@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { Product } from '@features/products/product.interface';
 import { ToastrService } from 'ngx-toastr';
 import { BehaviorSubject } from 'rxjs';
@@ -23,6 +23,22 @@ export class CartStateService {
   );
   private readonly _cartCalculatorService = inject(CartCalculatorService);
   private readonly _toastrService = inject(ToastrService);
+
+  private readonly _products = signal<Product[]>([]);
+
+  readonly totalAmount = computed(() =>
+    this._cartCalculatorService.calculateTotal(this._products())
+  );
+
+  readonly productsAcount = computed(() =>
+    this._cartCalculatorService.calculateTotal(this._products())
+  );
+
+  readonly cartStore = computed(() => ({
+    products: this._products,
+    totalAmount: this.totalAmount(),
+    productsCount: this.productsAcount(),
+  }));
 
   cart$ = this._cartState.asObservable();
 
